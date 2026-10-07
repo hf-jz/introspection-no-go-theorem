@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A No-Go Theorem for Introspection in Pretrained Generative Language Models</title>
+<meta name="description" content="A 42-page technical paper. Within static pretraining and autoregressive generation, the self-report and the model's own hidden state are conditionally independent: I(R;H | theta,c) = 0. Six theorems, complete proofs, explicit scope.">
+<link rel="canonical" href="https://hf-jz.github.io/introspection-no-go-theorem/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A No-Go Theorem for Introspection in Pretrained Generative Language Models">
+<meta property="og:description" content="Six theorems showing that the native generative regime admits no introspective information channel, no verify-by-generation, and no privileged self-access.">
+<meta property="og:url" content="https://hf-jz.github.io/introspection-no-go-theorem/">
+<meta property="og:image" content="https://hf-jz.github.io/introspection-no-go-theorem/assets/page1.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="author" content="Sheng Cheng">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%231d4e89'/%3E%3C/svg%3E">
+<style>
+*,*::before,*::after{box-sizing:border-box}
+:root{
+  color-scheme:light dark;
+  --bg:#f4f4f2;--panel:#fdfdfc;--ink:#15171b;--muted:#575c65;--line:#dcdcd6;
+  --accent:#1d4e89;--accent-ink:#fff;--soft:#e9eef4;
+  --shadow:0 16px 36px rgba(21,23,27,.10);
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --serif:"Iowan Old Style",Palatino,"Palatino Linotype",Georgia,serif;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --r:6px;--maxw:1080px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--bg:#0f1114;--panel:#16191d;--ink:#eceef1;--muted:#9aa1ab;--line:#282d34;--accent:#8fb4e3;--accent-ink:#0f1114;--soft:#17212c;--shadow:0 18px 40px rgba(0,0,0,.5)}
+}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:17px;line-height:1.62;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px;text-decoration-color:var(--line)}
+a:hover{text-decoration-color:var(--accent)}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+section{padding:64px 0;border-top:1px solid var(--line);scroll-margin-top:72px}
+html{scroll-behavior:smooth}@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+h1,h2,h3{margin:0;line-height:1.12;letter-spacing:-.02em}
+h2{font-size:clamp(1.5rem,3vw,1.95rem);font-weight:640}
+h3{font-size:1.05rem;font-weight:640;letter-spacing:-.01em}
+p{margin:14px 0 0;max-width:66ch;color:var(--ink)}
+.lead{color:var(--muted)}
+.mono{font-family:var(--mono);font-size:12.5px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
+.grade{font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;color:var(--accent);border:1px solid var(--line);border-radius:var(--r);padding:3px 8px;white-space:nowrap}
+
+/* nav */
+header.nav{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--line)}
+.nav-in{max-width:var(--maxw);margin:0 auto;height:62px;padding:0 24px;display:flex;align-items:center;gap:20px}
+.brand{font-family:var(--mono);font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nav-links{margin-left:auto;display:none;gap:22px;font-size:14px}
+.nav-links a{color:var(--muted);text-decoration:none}
+.nav-links a:hover{color:var(--ink)}
+@media (min-width:820px){.nav-links{display:flex}}
+
+/* buttons */
+.btn{display:inline-block;font-size:14.5px;font-weight:560;padding:10px 18px;border-radius:var(--r);border:1px solid var(--line);color:var(--ink);text-decoration:none;background:var(--panel)}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.primary:hover{filter:brightness(1.08)}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+
+/* hero */
+.hero{max-width:var(--maxw);margin:0 auto;padding:48px 24px 52px;display:grid;gap:40px}
+@media (min-width:900px){.hero{grid-template-columns:1.35fr .65fr;align-items:center;padding-top:56px;gap:40px}}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;max-width:none}
+.hero h1{font-size:clamp(1.7rem,3.6vw,2rem);margin-top:14px;font-weight:660}
+.hero .sub{margin-top:18px;max-width:50ch;font-family:var(--serif);font-size:1.14rem;line-height:1.55;color:var(--muted)}
+figure{margin:0}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);background:var(--panel)}
+
+/* result */
+.result{background:var(--soft);border-top:1px solid var(--line)}
+.formula{font-family:var(--serif);font-style:italic;font-size:clamp(1.7rem,5vw,2.6rem);text-align:center;margin:26px 0 0;letter-spacing:.01em}
+.formula .eq{font-style:normal}
+.fig-note{text-align:center;margin-top:14px;font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.03em}
+.two{display:grid;gap:36px;margin-top:34px}
+@media (min-width:820px){.two{grid-template-columns:1fr 1fr;gap:56px}}
+dl{margin:18px 0 0}
+dt{margin-top:18px;font-weight:600}
+dt:first-child{margin-top:0}
+dd{margin:4px 0 0;color:var(--muted);font-size:15.5px;max-width:52ch}
+.sym{font-family:var(--mono);font-size:13px;color:var(--accent);margin-right:6px}
+
+/* theorems */
+.titems{margin-top:8px}
+.titem{display:grid;gap:8px;padding:26px 0 26px 20px;border-left:2px solid var(--line)}
+.titem+.titem{margin-top:4px}
+.titem:hover{border-left-color:var(--accent)}
+.titem h3{display:flex;flex-wrap:wrap;align-items:center;gap:12px}
+.titem p{margin:0;max-width:74ch}
+.tmeta{font-family:var(--mono);font-size:12px;color:var(--muted);letter-spacing:.02em}
+@media (min-width:820px){.titem{grid-template-columns:1fr 300px}.titem>div:first-child{margin-right:24px}}
+
+/* page strip */
+.strip{display:grid;gap:28px;margin-top:34px}
+@media (min-width:760px){.strip{grid-template-columns:repeat(3,1fr);gap:24px}}
+.strip figcaption{margin-top:12px;font-size:13.5px;color:var(--muted);line-height:1.45}
+
+/* positioning */
+.rows{margin-top:30px}
+.row{display:grid;gap:6px;padding:22px 0}
+.row+.row{border-top:1px solid var(--line)}
+@media (min-width:820px){.row{grid-template-columns:290px 1fr;gap:36px;align-items:start}.row+.row{border-top:1px solid var(--line)}}
+.row .src{font-size:15px;font-weight:620}
+.row .src span{display:block;font-weight:400;font-size:13.5px;color:var(--muted);margin-top:3px}
+.row p{margin:0;font-size:15.5px;color:var(--muted)}
+
+/* scope */
+.panels{display:grid;gap:24px;margin-top:34px}
+@media (min-width:820px){.panels{grid-template-columns:1fr 1fr}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:26px}
+.panel ul{margin:14px 0 0;padding-left:20px;color:var(--muted);font-size:15.5px}
+.panel li{margin:8px 0}
+.relax{margin-top:34px;display:grid;gap:2px}
+.relax .r{display:grid;gap:4px;padding:14px 0;border-top:1px solid var(--line)}
+@media (min-width:820px){.relax .r{grid-template-columns:1fr 220px;gap:24px;align-items:baseline}}
+.relax .r span:last-child{font-family:var(--mono);font-size:13px;color:var(--muted)}
+
+/* outline, cite, refs */
+.cols2{display:grid;gap:10px;margin-top:26px}
+@media (min-width:760px){.cols2{grid-template-columns:1fr 1fr;gap:14px 44px}}
+.cols2 div{padding:14px 0;border-top:1px solid var(--line)}
+.cols2 b{display:block;font-size:15px}
+.cols2 span{color:var(--muted);font-size:14.5px}
+pre{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;overflow-x:auto;font-family:var(--mono);font-size:13px;line-height:1.6;margin:26px 0 0;color:var(--ink)}
+ol.refs{margin:26px 0 0;padding-left:22px;color:var(--muted);font-size:15px}
+ol.refs li{margin:10px 0}
+.hl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+footer{padding:52px 0 72px;border-top:1px solid var(--line);color:var(--muted);font-size:14.5px}
+footer .frow{display:flex;flex-wrap:wrap;gap:12px 28px;margin-top:12px}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ScholarlyArticle",
+"name":"Introspective Capacity of Pretrained Generative Language Models: A No-Go Theorem under Static Pretraining and Autoregressive Generation",
+"author":{"@type":"Person","name":"Sheng Cheng","affiliation":"Hefei Jiuzhai Big Data Technology Co., Ltd."},
+"datePublished":"2026-09-23","inLanguage":"en","isAccessibleForFree":true,
+"url":"https://hf-jz.github.io/introspection-no-go-theorem/",
+"encoding":{"@type":"MediaObject","contentUrl":"https://hf-jz.github.io/introspection-no-go-theorem/introspection-no-go-theorem.pdf","encodingFormat":"application/pdf"},"license":"https://github.com/hf-jz/introspection-no-go-theorem"}
+</script>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-in">
+    <span class="brand">introspection-no-go-theorem</span>
+    <nav class="nav-links">
+      <a href="#result">Result</a>
+      <a href="#paradigm">Postulates</a>
+      <a href="#theorems">Theorems</a>
+      <a href="#positioning">Positioning</a>
+      <a href="#scope">Scope</a>
+      <a href="#cite">Cite</a>
+      <a href="introspection-no-go-theorem.pdf">PDF</a>
+    </nav>
+    <a class="btn" style="margin-left:auto" href="introspection-no-go-theorem.pdf">Read the paper</a>
+  </div>
+</header>
+
+<main>
+
+<div class="hero">
+  <div>
+    <p class="eyebrow" style="margin:0">Introspective capacity of pretrained generative language models</p>
+    <h1>A no-go theorem under static pretraining and autoregressive generation</h1>
+    <p class="sub">The report and the model's own hidden state are conditionally independent given the public pair (theta, c).</p>
+    <div class="cta">
+      <a class="btn primary" href="introspection-no-go-theorem.pdf">Read the paper</a>
+      <a class="btn" href="https://github.com/hf-jz/introspection-no-go-theorem">GitHub</a>
+    </div>
+  </div>
+  <figure>
+    <img src="assets/page1.jpg" width="926" height="1310" alt="First page of the paper: title, author, affiliation, and abstract">
+  </figure>
+</div>
+
+<section class="result" id="result">
+  <div class="wrap">
+    <p class="mono" style="margin:0">Theorem 1a</p>
+    <h2 style="margin-top:10px">In the native generative regime there is no introspective channel</h2>
+    <p class="formula">I( R ; H | <span class="eq">&theta;</span>, c ) = 0</p>
+    <p class="fig-note">report R, hidden state H, parameters theta, public context c</p>
+    <div class="two">
+      <div>
+        <p style="margin-top:0">Everything a generated model says about its own inner state is either a corpus statistic or a response to an intervention performed by someone else. The information does not travel from H to R at inference time.</p>
+        <p class="lead">Theorem 1b adds the second half: without state labels in the corpus, the introspective risk admits no nontrivial PAC-style guarantee, which follows from the No-Free-Lunch theorem.</p>
+      </div>
+      <div>
+        <p style="margin-top:0">The concept-injection experiments remain valid measurements. They are measurements of an intervention performed by the experimenter, which is third-party access by construction. What the theorem rules out is the claim that the same causal link exists when nobody intervenes.</p>
+        <p class="lead">Grade A. Provable from the five postulates with standard results in information theory and learning theory. Appendix A carries the complete proof.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="paradigm">
+  <div class="wrap">
+    <h2>Five postulates, five criteria</h2>
+    <p class="lead">The paradigm Pi is stated as five postulates so that each one can be relaxed on its own. Human-sense introspection is operationalized as five necessary criteria, so that each failure is attributable.</p>
+    <div class="two">
+      <div>
+        <h3 style="margin-top:34px">The paradigm</h3>
+        <dl>
+          <dt><span class="sym">Pi1</span>Static pretraining</dt>
+          <dd>Training on a fixed corpus, with no online or continual learning.</dd>
+          <dt><span class="sym">Pi2</span>Frozen at inference</dt>
+          <dd>Weights do not change while the system runs.</dd>
+          <dt><span class="sym">Pi3</span>Autoregressive decoding, bounded context</dt>
+          <dd>Output is produced token by token through the public text interface.</dd>
+          <dt><span class="sym">Pi4</span>No explicit verifier</dt>
+          <dd>The architecture contains no node that checks a claim for truth.</dd>
+          <dt><span class="sym">Pi5</span>No state labels in the corpus</dt>
+          <dd>Training data does not pair internal states with their descriptions.</dd>
+        </dl>
+      </div>
+      <div>
+        <h3 style="margin-top:34px">The criteria</h3>
+        <dl>
+          <dt><span class="sym">A1</span>Accuracy</dt>
+          <dd>The report agrees with the internal state it is about.</dd>
+          <dt><span class="sym">A2</span>Grounding</dt>
+          <dd>The report depends causally on that state, in the do-operator sense.</dd>
+          <dt><span class="sym">A3</span>Internality and privileged access</dt>
+          <dd>The causal path avoids the system's own sampled output, and no third party with equal compute reproduces the report.</dd>
+          <dt><span class="sym">A4</span>Metacognitive representation</dt>
+          <dd>A register is formed before emission and can itself be queried further.</dd>
+          <dt><span class="sym">A5</span>Closed-loop plasticity</dt>
+          <dd>An introspective event changes the system's future internal state through a private channel, not by re-reading its own text.</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="theorems">
+  <div class="wrap">
+    <h2>Six theorems</h2>
+    <p class="lead">Each theorem names the postulate that has to fail for it to fail. Appendix A proves all six and assembles Proposition P from them.</p>
+    <div class="titems">
+      <div class="titem">
+        <div>
+          <h3>Theorem 1: no introspective information channel <span class="grade">grade A</span></h3>
+          <p>1a: the report and the hidden state are conditionally independent given (theta, c). 1b: the training objective gives no supervision for the ground-truth introspection mapping, so introspective accuracy admits no nontrivial PAC-style guarantee.</p>
+        </div>
+        <div class="tmeta">Falls if Pi1, Pi3, or Pi5 is relaxed</div>
+      </div>
+      <div class="titem">
+        <div>
+          <h3>Theorem 2: proxy-objective mismatch <span class="grade">grade A</span></h3>
+          <p>Maximizing text likelihood does not constrain introspective fidelity, and can strictly harm it. A strict instantiation of regressional Goodhart, with the true objective identified as faithful reporting of the system's own state.</p>
+        </div>
+        <div class="tmeta">Falls if Pi1 or Pi5 is relaxed</div>
+      </div>
+      <div class="titem">
+        <div>
+          <h3>Theorem 3: closed-loop failure <span class="grade">grade A</span></h3>
+          <p>Frozen weights imply no private self-update channel. All self-influence passes through the public context channel, where the information content is bounded by C log|Sigma| bits.</p>
+        </div>
+        <div class="tmeta">Falls if Pi2 is relaxed</div>
+      </div>
+      <div class="titem">
+        <div>
+          <h3>Theorem 4: generation is not verification <span class="grade">grade A, 4c grade B</span></h3>
+          <p>The paradigm implements a sampler, not a verifier. A model's judgment that its own statement is grounded is a sample of corpus statistics, not an evaluation of truth, and in-paradigm truth is undecidable by the system itself. Calibration and introspective fidelity are in tension on open queries.</p>
+        </div>
+        <div class="tmeta">Falls if Pi4 is relaxed</div>
+      </div>
+      <div class="titem">
+        <div>
+          <h3>Theorem 5: no privileged channel <span class="grade">grade A</span></h3>
+          <p>Every report is reproducible by any third party holding (theta, c) at equal computational cost, which is the privileged self-access criterion of Song et al. holding as a theorem. 5c: there exist hidden-state description functions that an external probe reads exactly at cost O(d^2), while the model cannot report them above the random baseline.</p>
+        </div>
+        <div class="tmeta">Falls if Pi3 is relaxed</div>
+      </div>
+      <div class="titem">
+        <div>
+          <h3>Theorem 6: no self-model evolution <span class="grade">grade A, premise grade B</span></h3>
+          <p>The self-model is a constant function of the frozen kernel. The growth of runtime self-knowledge is bounded twice over, by the context window and by the fixed kernel.</p>
+        </div>
+        <div class="tmeta">Falls if Pi1 or Pi2 is relaxed</div>
+      </div>
+    </div>
+    <p class="lead" style="margin-top:34px"><b>Grading convention.</b> Grade A: provable under the stated postulates. Grade B: the mathematical core is grade A, application to real systems needs interpretive assumptions. Grade C: architectural judgment, taking no part in proofs. Grade D: philosophical premise, chiefly that A1 to A5 are necessary conditions for human introspection.</p>
+  </div>
+</section>
+
+<section id="inside">
+  <div class="wrap">
+    <h2>Inside the paper</h2>
+    <p class="lead">Formal framework in Chapter 2, the six theorems in Chapter 3, complete proofs in Appendix A. 42 pages, 59 references.</p>
+    <div class="strip">
+      <figure>
+        <img src="assets/page1.jpg" width="926" height="1310" alt="Title page and abstract" loading="lazy">
+        <figcaption>Page 1. Proposition P and the six theorem summaries in the abstract.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/page13.jpg" width="661" height="935" alt="Criteria A2 to A5, Remark 2, and the measurement tools" loading="lazy">
+        <figcaption>Page 13. Criteria A2 to A5, the necessity remark, and the grounding and closed-loop measures.</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/page30.jpg" width="661" height="935" alt="Appendix A: proof of Theorem 2 in three steps" loading="lazy">
+        <figcaption>Page 30. Appendix A, the three-step proof of Theorem 2 and Lemma 1.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<section id="positioning">
+  <div class="wrap">
+    <h2>Where this differs from the published work</h2>
+    <p class="lead">The existing literature describes what models do under observation. This paper proves what the paradigm can and cannot permit, and marks where the proof stops.</p>
+    <div class="rows">
+      <div class="row">
+        <div class="src">Lindsey et al. 2026, arXiv:2601.01828<span>Empirical, four operational criteria</span></div>
+        <p>Axiomatized here as five postulates and five criteria, adding A5 closed-loop plasticity. The measured 20% detection rate under concept injection, the zero net benefit for base models, and the authors' own caveats are treated as corollaries of the theorems, not as evidence of an in-paradigm capacity.</p>
+      </div>
+      <div class="row">
+        <div class="src">Song et al. 2025b, arXiv:2508.14802<span>Privileged self-access as a definition</span></div>
+        <p>Becomes Theorem 5, derived rather than assumed. 5c separates the two channels: an external probe reads certain state descriptions exactly at cost O(d^2) while the same model cannot report them above the random baseline.</p>
+      </div>
+      <div class="row">
+        <div class="src">Comsa and Shanahan 2025, arXiv:2506.05068<span>Introspection as accurate causal self-description</span></div>
+        <p>Absorbed as A2 together with the first clause of A3. The causal test is kept, and its scope is made explicit: it holds under external intervention, not in the native regime.</p>
+      </div>
+      <div class="row">
+        <div class="src">Kammerer and Frankish 2023; Long 2023<span>Functional definition built on online control</span></div>
+        <p>Supplies the online-control element that becomes A5. Where the definitional literature stops at "usable for control", this paper also requires the loop to be private, and Theorem 3 bounds in-paradigm influence to the public text channel at C log|Sigma| bits.</p>
+      </div>
+      <div class="row">
+        <div class="src">Concept injection<span>Representation engineering, activation addition, SelfIE, Patchscopes</span></div>
+        <p>Treated as an out-of-paradigm intervention. An intervention performed by the experimenter is third-party access by construction, so however striking the outputs, the protocol cannot certify a first-person channel.</p>
+      </div>
+      <div class="row">
+        <div class="src">Kalai and Vempala 2023, arXiv:2311.14648<span>Calibrated models must hallucinate</span></div>
+        <p>Reused as a tool rather than contested. Theorem 4c combines it with the softmax bottleneck to obtain a calibration and fidelity tension on open introspection queries.</p>
+      </div>
+      <div class="row">
+        <div class="src">Goodhart and reward hacking<span>Manheim and Garrabrant 2018; Skalse et al. 2022</span></div>
+        <p>Theorem 2 is a strict instantiation of regressional Goodhart. The novelty is the identity of the true objective and the proof that its orthogonality to the training signal is structural rather than circumstantial.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="scope">
+  <div class="wrap">
+    <h2>What is claimed, and what is not</h2>
+    <p class="lead">The result is scoped to the paradigm. Every impossibility theorem presupposes its postulates, and relaxing any single one dissolves the corresponding theorem.</p>
+    <div class="panels">
+      <div class="panel">
+        <h3>Claimed</h3>
+        <p style="margin-top:10px">Proposition P. Within the paradigm given by Pi1 to Pi5, no system obtained by static pretraining plus autoregressive generation satisfies all five criteria A1 to A5 of human-significance introspection.</p>
+        <ul>
+          <li>The report-state mutual information is zero in the unintervened regime.</li>
+          <li>No in-paradigm recipe restores it, because the obstacle is the training signal and the interface, not the scale.</li>
+        </ul>
+      </div>
+      <div class="panel">
+        <h3>Not claimed</h3>
+        <p style="margin-top:10px">No universal negation. The paper does not claim that no machine can introspect, and it makes no commitment about qualia or phenomenal consciousness.</p>
+        <ul>
+          <li>Relax one postulate and the matching theorem falls.</li>
+          <li>The intended reading is: impossible within the current paradigm.</li>
+          <li>The theorem is stated so that it can be refuted. A stable positive measurement of report-state dependence in the native regime would kill it.</li>
+        </ul>
+      </div>
+    </div>
+    <h3 style="margin-top:44px">Relaxation map</h3>
+    <div class="relax">
+      <div class="r"><span>Pi1 online or continual learning</span><span>Theorems 1, 2, 6 fail</span></div>
+      <div class="r"><span>Pi2 plasticity at inference</span><span>Theorems 3, 6 fail</span></div>
+      <div class="r"><span>Pi3 non-textual interface or embodiment</span><span>Theorems 1, 5 fail</span></div>
+      <div class="r"><span>Pi4 explicit verifier or self-supervised objective</span><span>Theorem 4 fails</span></div>
+      <div class="r"><span>Pi5 corpus contains state labels</span><span>Theorems 1b, 2 fail</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="outline">
+  <div class="wrap">
+    <h2>Contents</h2>
+    <div class="cols2">
+      <div><b>1. Introduction</b><span>Proposition P, related work, the three gaps in the literature, contributions, grading convention.</span></div>
+      <div><b>2. Formal framework</b><span>The postulates, the mathematics of residual streams and the softmax readout, the state model, the criteria, the measurement tools, the causal graph and Bayesian network.</span></div>
+      <div><b>3. Core theorems</b><span>Theorems 1 to 6 with the sampling model, the proxy objective, the closed-loop bound, the verifier gap, public computability, and the frozen kernel.</span></div>
+      <div><b>4. Concept injection reinterpreted</b><span>A falsifiability test of the theorems against the published measurements, and each self-reported limitation of that work matched to the theorem predicting it.</span></div>
+      <div><b>5. Boundaries and positioning</b><span>Relaxation analysis, functional versus phenomenal introspection, relations to HOT, IIT, GWT and biological naturalism, and the explicit note on "never".</span></div>
+      <div><b>6. Conclusion</b><span>Adjudication of Proposition P, theorem summary, and a provenance table separating cited material from new material.</span></div>
+      <div><b>Appendix A. Proofs</b><span>Complete proofs of Theorems 1 to 6, and the assembled proof of Proposition P.</span></div>
+      <div><b>Appendix B. Background</b><span>Notation, information theory, computational learning theory, the Goodhart taxonomy, causal inference, algorithmic information theory and recursion theory.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="cite">
+  <div class="wrap">
+    <h2>Citation</h2>
+    <p class="lead">The paper is an independent technical work dated September 2026. BibTeX entry:</p>
+<pre>@misc{cheng2026introspection,
+  title        = {Introspective Capacity of Pretrained Generative Language Models:
+                  A No-Go Theorem under Static Pretraining and Autoregressive Generation},
+  author       = {Cheng, Sheng},
+  year         = {2026},
+  month        = {September},
+  institution  = {Hefei Jiuzhai Big Data Technology Co., Ltd.},
+  type         = {Independent technical paper},
+  note         = {42 pages},
+  url          = {https://hf-jz.github.io/introspection-no-go-theorem/}
+}</pre>
+    <p class="lead" style="margin-top:18px">The theorems are derived from the postulates and from standard results in information theory, learning theory and causal inference. They do not depend on any experimental data, which is what lets the published measurements serve as a test of them.</p>
+  </div>
+</section>
+
+<section id="references">
+  <div class="wrap">
+    <h2>Selected references</h2>
+    <p class="lead">The full bibliography carries 59 entries in the PDF.</p>
+    <ol class="refs">
+      <li>Lindsey, J. et al. (2026). <i>Emergent Introspective Awareness in Large Language Models.</i> arXiv:2601.01828</li>
+      <li>Song, S., Lederman, H., Hu, J., Mahowald, K. (2025). <i>Privileged Self-Access Matters for Introspection in AI.</i> arXiv:2508.14802</li>
+      <li>Comsa, I. M., Shanahan, M. (2025). <i>Does It Make Sense to Speak of Introspection in Large Language Models?</i> arXiv:2506.05068</li>
+      <li>Kammerer, F., Frankish, K. (2023). <i>What Forms Could Introspective Systems Take?</i> Journal of Consciousness Studies 30(9-10)</li>
+      <li>Kalai, A. T., Vempala, S. S. (2023). <i>Calibrated Language Models Must Hallucinate.</i> arXiv:2311.14648</li>
+      <li>Manheim, D., Garrabrant, S. (2018). <i>Categorizing Variants of Goodhart's Law.</i> arXiv:1803.04585</li>
+      <li>Skalse, J. et al. (2022). <i>Defining and Characterizing Reward Hacking.</i> arXiv:2209.13085</li>
+      <li>Elhage, N. et al. (2021). <i>A Mathematical Framework for Transformer Circuits.</i> transformer-circuits.pub</li>
+      <li>Elhage, N. et al. (2022). <i>Toy Models of Superposition.</i> arXiv:2209.10652</li>
+      <li>Yang, Z. et al. (2018). <i>Breaking the Softmax Bottleneck.</i> ICLR 2018, arXiv:1711.03953</li>
+      <li>Joudaki, A. et al. (2025). <i>Barriers for Learning in an Evolving World: Mathematical Understanding of Loss of Plasticity.</i> arXiv:2510.00304</li>
+    </ol>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p style="margin:0"><b style="color:var(--ink)">Introspective Capacity of Pretrained Generative Language Models: A No-Go Theorem under Static Pretraining and Autoregressive Generation</b></p>
+    <div class="frow">
+      <span>Sheng Cheng</span>
+      <span>Hefei Jiuzhai Big Data Technology Co., Ltd., Hefei, China</span>
+      <a href="mailto:c.sheng@cumt.edu.cn">c.sheng@cumt.edu.cn</a>
+      <span>September 2026</span>
+    </div>
+    <div class="frow">
+      <a href="introspection-no-go-theorem.pdf">Paper (PDF, 42 pages)</a>
+      <a href="https://github.com/hf-jz/introspection-no-go-theorem">Repository</a>
+      <a href="https://github.com/hf-jz/introspection-no-go-theorem/blob/main/README.md">README</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

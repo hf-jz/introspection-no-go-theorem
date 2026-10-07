@@ -5,6 +5,7 @@
 **Affiliation:** Hefei Jiuzhai Big Data Technology Co., Ltd., Hefei, China
 **Contact:** c.sheng@cumt.edu.cn
 **Document:** [`introspection-no-go-theorem.pdf`](introspection-no-go-theorem.pdf), 42 pages
+**Project page:** https://hf-jz.github.io/introspection-no-go-theorem/
 **Compiled with:** XeLaTeX (TeX Live 2021), A4, standard `article` class, 1.5 line spacing
 **Status:** independent technical paper, September 2026
 
@@ -204,7 +205,10 @@ They do not depend on any of the experimental data, which is why the data can se
 
 ```
 .
+├── index.html                        # project page, served at hf-jz.github.io/introspection-no-go-theorem
+├── assets/                           # page previews used by the project page
 ├── introspection-no-go-theorem.pdf   # the paper, 42 pages
+├── .github/workflows/pages.yml       # deploys the project page to GitHub Pages
 └── README.md                         # this file
 ```
 
